@@ -12,7 +12,7 @@ gulp.task('clean', function () {
         .pipe(clean());
 });
 
-gulp.task('babelify', () => {
+gulp.task('babelify:main', () => {
   return browserify('src/index.js')
     .transform(babelify, {presets: ['es2015']})
     .bundle()
@@ -20,8 +20,16 @@ gulp.task('babelify', () => {
     .pipe(gulp.dest('dist'));
 });
 
+gulp.task('babelify:worker', () => {
+  return browserify('src/worker.js')
+    .transform(babelify, {presets: ['es2015']})
+    .bundle()
+    .pipe(source('orchester.worker.js'))
+    .pipe(gulp.dest('dist'));
+});
+
 gulp.task('uglify:js', () => {
-  return gulp.src('dist/orchester.js')
+  return gulp.src('dist/*.js')
     .pipe(uglify())
     .pipe(rename({
       extname: '.min.js'
@@ -30,5 +38,5 @@ gulp.task('uglify:js', () => {
 });
 
 gulp.task('build', () => {
-  return runSequence('clean', 'babelify', 'uglify:js')
+  return runSequence('clean', ['babelify:main', 'babelify:worker'], 'uglify:js')
 });

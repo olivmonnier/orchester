@@ -1,14 +1,17 @@
-import openDatabase from './database/open';
 import isOnline from './services/isOnline';
+import workerHelper from './services/workerHelper';
 
 let runnerSync;
+let _worker;
 
 class Orchester {
+
   constructor(params) {
-    const { basename, adapters, interval } = params;
+    const { basename, adapters, interval, workerPath } = params;
+
+    _worker = workerHelper(workerPath, basename);
 
     this.adapters = adapters;
-    this.db = openDatabase(basename);
     this.interval = interval || 5000;
     this.isOnline = isOnline();
 
@@ -28,28 +31,24 @@ class Orchester {
   addRepository(adapter, name, synced = false) {
     synced = (synced) ? 'true' : 'false';
 
-    this.db.then((db) => {
-      db.repositories.save({ name, adapter, synced }).then((result) => {
-        const addEventRepo = new CustomEvent('newrepository', result);
+    _worker.save({ table: 'Repositories', data: { name, adapter, synced } }).then((result) => {
+      const addEventRepo = new CustomEvent('newrepository', result);
 
-        this.adapters[adapter].get.call(this, result);
-        document.dispatchEvent(addEventRepo);
-      })
-    })
+      this.adapters[adapter].get.call(this, result);
+      document.dispatchEvent(addEventRepo);
+    });
   }
   removeRepository(id) {
-    this.db.then((db) => {
-      db.resources.get({ repositoryId: id }).then((resources) => {
-        resources.forEach((resource) => {
-          db.resources.delete(resource.id)
-        })
-      });
-      db.repositories.delete(id).then((result) => {
-        const deleteEventRepo = new CustomEvent('deleterepository', result);
+    _worker.get({ table: 'Resources', search: { repositoryId: id } }).then((resources) => {
+      resources.forEach((resource) => {
+        _worker.delete({ table: 'Resources', id: resource.id })
+      })
+    });
+    _worker.delete({ table: 'Repository', id }).then((result) => {
+      const deleteEventRepo = new CustomEvent('deleterepository', result);
 
-        document.dispatchEvent(deleteEventRepo);
-      });
-    })
+      document.dispatchEvent(deleteEventRepo);
+    });
   }
   sync() {
     runnerSync = setInterval(() => {
@@ -59,13 +58,11 @@ class Orchester {
 
       document.dispatchEvent(startEventSync);
 
-      this.db.then((db) => {
-        db.repositories.get({synced: 'true'}).then((repositories) => {
-          repositories.forEach((repo) => {
-            runners.push(this.adapters[repo.adapter].get.call(this, repo.id))
-          })
-          Promise.all(runners).then(() => document.dispatchEvent(endEventSync))
+      _worker.get({ table: 'Repositories', search: {synced: 'true'} }).then((repositories) => {
+        repositories.forEach((repo) => {
+          runners.push(this.adapters[repo.adapter].get.call(this, repo.id))
         })
+        Promise.all(runners).then(() => document.dispatchEvent(endEventSync))
       })
     }, this.interval)
   }

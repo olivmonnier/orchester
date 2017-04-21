@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <script src="dist/bundle.js"></script>
+    <script>
+      var o = new Orchester({
+        basename: 'test',
+        adapters: {
+          'locale': {
+            get: function() {
+              return new Promise(function(resolve, reject) {
+                setTimeout(function() {
+                  console.log('locale');
+                  resolve();
+                }, 2000)
+              })
+            }
+          }
+        }
+      })
+      document.addEventListener('startsync', function() {
+        console.log('startsync')
+      })
+      document.addEventListener('endsync', function() {
+        console.log('endsync')
+      })
+    </script>
+  </body>
+</html>

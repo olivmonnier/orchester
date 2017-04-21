@@ -5,9 +5,10 @@
     <title></title>
   </head>
   <body>
-    <script src="dist/bundle.js"></script>
+    <script src="dist/orchester.js"></script>
     <script>
       var o = new Orchester({
+        workerPath: 'dist/orchester.worker.js',
         basename: 'test',
         adapters: {
           'locale': {

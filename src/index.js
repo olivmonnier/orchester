@@ -21,7 +21,7 @@ class Orchester {
       })
       window.addEventListener('offline', () => {
         this.isOnline = false;
-        this.sync(false);
+        this.stopSync();
       })
     }
   }
@@ -29,8 +29,11 @@ class Orchester {
     synced = (synced) ? 'true' : 'false';
 
     this.db.then((db) => {
-      db.repositories.save({ name, adapter, synced }).then(result => {
+      db.repositories.save({ name, adapter, synced }).then((result) => {
+        const addEventRepo = new CustomEvent('newrepository', result);
+
         this.adapters[adapter].get.call(this, result);
+        document.dispatchEvent(addEventRepo);
       })
     })
   }
@@ -41,30 +44,33 @@ class Orchester {
           db.resources.delete(resource.id)
         })
       });
-      db.repositories.delete(id);
+      db.repositories.delete(id).then((result) => {
+        const deleteEventRepo = new CustomEvent('deleterepository', result);
+
+        document.dispatchEvent(deleteEventRepo);
+      });
     })
   }
-  sync(state = true) {
-    if (state) {
-      runnerSync = setInterval(() => {
-        let runners = [];
-        const startEventSync = new CustomEvent('startsync', this);
-        const endEventSync = new CustomEvent('endsync', this);
+  sync() {
+    runnerSync = setInterval(() => {
+      let runners = [];
+      const startEventSync = new CustomEvent('startsync', this);
+      const endEventSync = new CustomEvent('endsync', this);
 
-        document.dispatchEvent(startEventSync);
+      document.dispatchEvent(startEventSync);
 
-        this.db.then((db) => {
-          db.repositories.get({synced: 'true'}).then((repositories) => {
-            repositories.forEach((repo) => {
-              runners.push(this.adapters[repo.adapter].get.call(this, repo.id))
-            })
-            Promise.all(runners).then(() => document.dispatchEvent(endEventSync))
+      this.db.then((db) => {
+        db.repositories.get({synced: 'true'}).then((repositories) => {
+          repositories.forEach((repo) => {
+            runners.push(this.adapters[repo.adapter].get.call(this, repo.id))
           })
+          Promise.all(runners).then(() => document.dispatchEvent(endEventSync))
         })
-      }, this.interval)
-    } else {
-      clearInterval(runnerSync)
-    }
+      })
+    }, this.interval)
+  }
+  stopSync() {
+    clearInterval(runnerSync);
   }
 }
 

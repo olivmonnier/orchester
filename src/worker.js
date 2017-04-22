@@ -39,5 +39,6 @@ self.onmessage = function (event) {
 }
 
 function sendResult(result) {
-  self.postMessage(JSON.stringify(result))
+  self.postMessage(JSON.stringify(result));
+  self.close();
 }

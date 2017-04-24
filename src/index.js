@@ -51,11 +51,13 @@ class Orchester {
     });
   }
   sync() {
+    let runners;
+
     runnerSync = setInterval(() => {
-      let runners = [];
       const startEventSync = new CustomEvent('startsync', this);
       const endEventSync = new CustomEvent('endsync', this);
 
+      runners = [];
       document.dispatchEvent(startEventSync);
 
       _worker.get({ table: 'Repositories', search: {synced: 'true'} }).then((repositories) => {

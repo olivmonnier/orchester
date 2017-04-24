@@ -10,6 +10,7 @@ export default function (workerPath, basename) {
         const result = JSON.parse(event.data);
 
         resolve(result);
+        worker.terminate();
       }
     })
   }

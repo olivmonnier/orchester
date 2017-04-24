@@ -5,11 +5,15 @@ import save from './database/save';
 import _delete from './database/delete';
 import deleteAll from './database/deleteAll';
 
+let db;
+
 self.onmessage = function (event) {
   const params = JSON.parse(event.data);
   const { request, basename, table, search, data, id } = params;
 
   open(basename).then((database) => {
+    db = database;
+
     switch(request) {
       case('get'): {
         get(table, database, search).then((result) => sendResult(result))
@@ -35,7 +39,7 @@ self.onmessage = function (event) {
         deleteAll(table, database).then((result) => sendResult(result))
       }
     }
-  })
+  }).then(() => db.close())
 }
 
 function sendResult(result) {

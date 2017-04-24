@@ -12,12 +12,13 @@
         basename: 'test',
         adapters: {
           'locale': {
-            get: function() {
+            get: function(id) {
+              var self = this;
               return new Promise(function(resolve, reject) {
-                setTimeout(function() {
-                  console.log('locale');
+                self.repositories.get(id).then(function(result) {
+                  console.log(result);
                   resolve();
-                }, 2000)
+                })
               })
             }
           }

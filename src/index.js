@@ -9,6 +9,10 @@ export default class Orchester {
     const { basename, adapters, interval, workerPath } = params;
     const self = this;
 
+    if (!workerPath) {
+      return new Error('You must declare a path for the worker');
+    }
+
     _worker = workerHelper(workerPath, basename);
 
     this.adapters = adapters;

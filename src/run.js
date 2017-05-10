@@ -15,12 +15,8 @@ export default function(params) {
   if (isOnline()) sync(this);
 
   if (typeof window.addEventListener === "function") {
-    window.addEventListener('online', () => {
-      sync(this);
-    })
-    window.addEventListener('offline', () => {
-      stopSync();
-    })
+    window.addEventListener('online', () => sync(this));
+    window.addEventListener('offline', () => stopSync());
   }
 
   return {

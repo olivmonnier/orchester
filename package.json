@@ -4,8 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "gulp build",
-    "dev": "npm run build && static-server -p 3000"
+    "build": "gulp build"
   },
   "keywords": [],
   "author": "",

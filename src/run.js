@@ -6,7 +6,7 @@ export default function(params) {
   const { basename, adapters, interval } = params;
   const self = this;
 
-  const _worker = workerHelper(basename);
+  const _worker = workerHelper(basename, adapters);
 
   if (isOnline()) sync(params);
 
@@ -23,14 +23,14 @@ export default function(params) {
       put(data) {
         const { adapter, name } = data;
 
-        if (adapter == undefined || name === undefined) {
+        if (adapter === undefined || name === undefined) {
           return console.error(new Error('A repository must be have a name & adapter value'));
         }
         data['synced'] = (data['synced']) ? 'true' : 'false';
 
         return _worker.save({ table: 'Repositories', data }).then((result) => {
           if (!data['id']) {
-            self.adapters[adapter].get.call(self, result);
+            adapters[adapter].get.call(self, result);
           }
         });
       },
@@ -53,8 +53,8 @@ export default function(params) {
       put(data) {
         const { name, repositoryId } = data;
 
-        if (!name || !repositoryId ) {
-          return new Error('A resource must be have a name and a repository id')
+        if (name === undefined || repositoryId === undefined ) {
+          return console.error(new Error('A resource must be have a name and a repository id'))
         }
         return _worker.save({ table: 'Resources', data })
       },

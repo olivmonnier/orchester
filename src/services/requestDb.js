@@ -7,7 +7,7 @@ import deleteAll from '../database/deleteAll';
 
 export default function (params) {
   let db;
-  const { request, basename, table, search, data, id } = params;
+  const { adapter, request, basename, table, search, data, id } = params;
 
   return open(basename).then((database) => {
     db = database;
@@ -24,7 +24,17 @@ export default function (params) {
       break;
 
       case('save'): {
-        return save(table, database, data)
+        return save(table, database, data).then((result) => {
+          const buildData = Object.assign(data, {
+            id: result
+          })
+
+          if (adapter && adapter.hasOwnProperty('post')) {
+            adapter.post(buildData);
+          }
+          
+          return buildData;
+        })
       };
       break;
 

@@ -6,13 +6,13 @@ export const sync = function(runner) {
   let runners;
   const { adapters, basename, interval } = runner;
 
-  const _worker = workerHelper(basename);
+  const _worker = workerHelper(basename, adapters);
 
   runnerSync = setInterval(() => {
     runners = [];
 
     _worker.get({ table: 'Repositories', search: {synced: 'true'} }).then((repositories) => {
-      if(repositories.length > 0) {        
+      if(repositories.length > 0) {
         repositories.forEach((repo) => {
           runners.push(adapters[repo.adapter].get.call(runner, repo))
         })

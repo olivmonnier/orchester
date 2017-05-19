@@ -1,5 +1,4 @@
 export default function (workerPath, basename) {
-
   const builder = (params) => {
     const worker = new Worker(workerPath);
 
@@ -7,10 +6,7 @@ export default function (workerPath, basename) {
       worker.postMessage(JSON.stringify(Object.assign({ basename }, params)));
       worker.onerror = reject;
       worker.onmessage = (event) => {
-        const result = JSON.parse(event.data);
-
-        resolve(result);
-        worker.terminate();
+        resolve(JSON.parse(event.data));
       }
     })
   }

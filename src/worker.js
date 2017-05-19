@@ -16,33 +16,34 @@ self.onmessage = function (event) {
 
     switch(request) {
       case('get'): {
-        get(table, database, search).then((result) => sendResult(result))
+        get(table, database, search).then((result) => sendResult(db, result))
       };
       break;
 
       case('getAll'): {
-        getAll(table, database).then((result) => sendResult(result))
+        getAll(table, database).then((result) => sendResult(db, result))
       };
       break;
 
       case('save'): {
-        save(table, database, data).then((result) => sendResult(result))
+        save(table, database, data).then((result) => sendResult(db, result))
       };
       break;
 
       case('delete'): {
-        _delete(table, database, id).then((result) => sendResult(result))
+        _delete(table, database, id).then((result) => sendResult(db, result))
       };
       break;
 
       case('deleteAll'): {
-        deleteAll(table, database).then((result) => sendResult(result))
+        deleteAll(table, database).then((result) => sendResult(db, result))
       }
     }
-  }).then(() => db.close())
+  })
 }
 
-function sendResult(result) {
+function sendResult(db, result) {
+  db.close();
   self.postMessage(JSON.stringify(result));
   self.close();
 }

@@ -12,18 +12,14 @@ export default function(params) {
 
   const _worker = workerHelper(workerPath, basename);
 
-  if (isOnline()) sync(this);
+  if (isOnline()) sync(params);
 
   if (typeof window.addEventListener === "function") {
-    window.addEventListener('online', () => sync(this));
+    window.addEventListener('online', () => sync(params));
     window.addEventListener('offline', () => stopSync());
   }
 
-  return {
-    adapters,
-    basename,
-    interval: interval || 5000,
-    workerPath,
+  return Object.assign(params, {
     repositories: {
       get(search) {
         return _worker.get({ table: 'Repositories', search })
@@ -70,5 +66,5 @@ export default function(params) {
         return _worker.delete({ table: 'Resources', id })
       }
     }
-  }
+  })
 }

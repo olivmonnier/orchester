@@ -1,14 +1,8 @@
-export default function (workerPath, basename) {
-  const builder = (params) => {
-    const worker = new Worker(workerPath);
+import requestDb from './requestDb';
 
-    return new Promise((resolve, reject) => {
-      worker.postMessage(JSON.stringify(Object.assign({ basename }, params)));
-      worker.onerror = reject;
-      worker.onmessage = (event) => {
-        resolve(JSON.parse(event.data));
-      }
-    })
+export default function (basename) {
+  const builder = (params) => {
+    return requestDb(Object.assign({ basename }, params))
   }
 
   return {

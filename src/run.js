@@ -3,14 +3,10 @@ import workerHelper from './services/workerHelper';
 import { sync, stopSync } from './sync';
 
 export default function(params) {
-  const { basename, adapters, interval, workerPath } = params;
+  const { basename, adapters, interval } = params;
   const self = this;
 
-  if (!workerPath) {
-    return new Error('You must declare a path for the worker');
-  }
-
-  const _worker = workerHelper(workerPath, basename);
+  const _worker = workerHelper(basename);
 
   if (isOnline()) sync(params);
 
@@ -27,8 +23,8 @@ export default function(params) {
       put(data) {
         const { adapter, name } = data;
 
-        if (!adapter || !name) {
-          return new Error('A repository must be have a name & adapter value');
+        if (adapter == undefined || name === undefined) {
+          return console.error(new Error('A repository must be have a name & adapter value'));
         }
         data['synced'] = (data['synced']) ? 'true' : 'false';
 

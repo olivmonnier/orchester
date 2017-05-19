@@ -12,19 +12,11 @@ gulp.task('clean', function () {
         .pipe(clean());
 });
 
-gulp.task('babelify:main', () => {
+gulp.task('babelify', () => {
   return browserify('src/index.js')
     .transform(babelify, {presets: ['es2015']})
     .bundle()
     .pipe(source('orchester.js'))
-    .pipe(gulp.dest('dist'));
-});
-
-gulp.task('babelify:worker', () => {
-  return browserify('src/worker.js')
-    .transform(babelify, {presets: ['es2015']})
-    .bundle()
-    .pipe(source('orchester.worker.js'))
     .pipe(gulp.dest('dist'));
 });
 
@@ -38,5 +30,5 @@ gulp.task('uglify:js', () => {
 });
 
 gulp.task('build', () => {
-  return runSequence('clean', ['babelify:main', 'babelify:worker'], 'uglify:js')
+  return runSequence('clean', 'babelify', 'uglify:js')
 });

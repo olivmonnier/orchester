@@ -6,7 +6,7 @@ export const sync = function(runner) {
   let runners;
   const { adapters, basename, interval } = runner;
 
-  const _worker = workerHelper(basename, adapters);
+  const _worker = workerHelper(basename);
 
   runnerSync = setInterval(() => {
     runners = [];

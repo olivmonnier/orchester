@@ -1,4 +1,4 @@
-export default function(worker) {
+export default function(adapters, worker) {
   return {
     get(search) {
       return worker.get({ table: 'Resources', search })

@@ -15,6 +15,9 @@ describe('Test', function() {
         'adapter2': {
           get: function(res) {
             console.log(res)
+          },
+          post: function(type, res) {
+            console.log('POST Event', res)
           }
         }
       }

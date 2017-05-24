@@ -8,7 +8,7 @@ export default function(params) {
   const { basename, adapters, interval } = params;
   const self = this;
 
-  const _worker = workerHelper(basename, adapters);
+  const _worker = workerHelper(basename);
 
   if (isOnline()) sync(params);
 
@@ -18,7 +18,7 @@ export default function(params) {
   }
 
   return Object.assign(params, {
-    repositories: apiRepositories(_worker),
-    resources: apiResources(_worker)
+    repositories: apiRepositories(adapters, _worker),
+    resources: apiResources(adapters, _worker)
   })
 }

@@ -24,23 +24,22 @@ export default function(adapters, worker) {
       });
     },
     remove(id) {
-      const self = this;
-
       worker.get({ table: 'Resources', search: { repositoryId: id } }).then((resources) => {
-        resources.forEach((resource) => self.resources.remove(resource.id))
+        resources.forEach((resource) => worker.delete({ table: 'Resources', id: resource.id }))
       });
-      return worker.delete({ table: 'Repository', id }).then((result) => {
-        const repository = self.repositories.get(result);
 
-        repository.then((repo) => {
-          const { adapter } = repo;
+      return worker.get({ table: 'Repositories', search: id }).then((repository) => {
+        const { adapter } = repository;
 
-          if (adapter.hasOwnProperty('remove')) {
-            adapter.remove('repository', repo)
+        worker.delete({ table: 'Repositories', id }).then(() => {
+          const ad = adapters[adapter]
+          if (ad && ad.hasOwnProperty('remove')) {
+            ad.remove('repository', repository)
           }
         })
-        return result;
-      });
+
+        return repository;
+      })
     },
     getResources(id) {
       return this.resources.get({ repositoryId: id })

@@ -18,6 +18,9 @@ describe('Test', function() {
           },
           post: function(type, res) {
             console.log('POST Event', res)
+          },
+          remove: function(type, res) {
+            console.log('DELETE Event', type, res);
           }
         }
       }
@@ -32,6 +35,13 @@ describe('Test', function() {
       name: 'Repo 2',
       adapter: 'adapter2',
       synced: true
+    });
+    orchester.repositories.put({
+      name: 'Repo 3',
+      adapter: 'adapter2',
+      synced: true
+    }).then((res) => {
+      orchester.repositories.remove(res.id)
     });
   })
 });

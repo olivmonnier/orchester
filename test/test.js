@@ -15,9 +15,6 @@ describe('Test', function() {
         'adapter2': {
           get: function(res) {
             console.log(res)
-          },
-          post: function(res) {
-            console.log('post adapter 2', res)
           }
         }
       }
@@ -33,10 +30,5 @@ describe('Test', function() {
       adapter: 'adapter2',
       synced: true
     });
-
-    orchester.resources.put({
-      name: 'Resource 1',
-      repositoryId: 2
-    })
   })
 });

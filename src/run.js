@@ -1,6 +1,8 @@
 import isOnline from './services/isOnline';
 import workerHelper from './services/workerHelper';
 import { sync, stopSync } from './sync';
+import apiRepositories from './api/repositories';
+import apiResources from './api/resources';
 
 export default function(params) {
   const { basename, adapters, interval } = params;
@@ -16,51 +18,7 @@ export default function(params) {
   }
 
   return Object.assign(params, {
-    repositories: {
-      get(search) {
-        return _worker.get({ table: 'Repositories', search })
-      },
-      put(data) {
-        const { adapter, name } = data;
-
-        if (adapter === undefined || name === undefined) {
-          return console.error(new Error('A repository must be have a name & adapter value'));
-        }
-        data['synced'] = (data['synced']) ? 'true' : 'false';
-
-        return _worker.save({ table: 'Repositories', data }).then((result) => {
-          if (!data['id']) {
-            adapters[adapter].get.call(self, result);
-          }
-        });
-      },
-      remove(id) {
-        _worker.get({ table: 'Resources', search: { repositoryId: id } }).then((resources) => {
-          resources.forEach((resource) => {
-            _worker.delete({ table: 'Resources', id: resource.id })
-          })
-        });
-        return _worker.delete({ table: 'Repository', id });
-      },
-      getResources(id) {
-        return this.resources.get({ repositoryId: id })
-      }
-    },
-    resources: {
-      get(search) {
-        return _worker.get({ table: 'Resources', search })
-      },
-      put(data) {
-        const { name, repositoryId } = data;
-
-        if (name === undefined || repositoryId === undefined ) {
-          return console.error(new Error('A resource must be have a name and a repository id'))
-        }
-        return _worker.save({ table: 'Resources', data })
-      },
-      remove(id) {
-        return _worker.delete({ table: 'Resources', id })
-      }
-    }
+    repositories: apiRepositories(_worker),
+    resources: apiResources(_worker)
   })
 }

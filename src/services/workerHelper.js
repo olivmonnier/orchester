@@ -1,6 +1,6 @@
 import requestDb from './requestDb';
 
-export default function (basename, adapters) {
+export default function (basename) {
   const builder = (params) => {
     return requestDb(Object.assign({ basename }, params))
   }
@@ -27,7 +27,6 @@ export default function (basename, adapters) {
       const { table, data } = params;
 
       return builder({
-        adapter: adapters[data.adapter],
         request: 'save',
         table,
         data

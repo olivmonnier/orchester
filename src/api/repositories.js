@@ -1,4 +1,6 @@
-export default function(adapters, worker) {
+export default function(instance, worker) {
+  const { adapters } = instance;
+
   return {
     get(search) {
       return worker.get({ table: 'Repositories', search })
@@ -14,7 +16,7 @@ export default function(adapters, worker) {
       return worker.save({ table: 'Repositories', data }).then((result) => {
         const ad = adapters[adapter];
 
-        if (ad.hasOwnProperty('post')) {
+        if (ad && ad.hasOwnProperty('post')) {
           ad.post('repository', result);
         }
         if (!data['id']) {
@@ -24,11 +26,11 @@ export default function(adapters, worker) {
       });
     },
     remove(id) {
-      worker.get({ table: 'Resources', search: { repositoryId: id } }).then((resources) => {
-        resources.forEach((resource) => worker.delete({ table: 'Resources', id: resource.id }))
+      worker.get({ table: 'Resources', search: { repositoryId: id } }).then((res) => {
+        res.forEach((resource) => worker.delete({ table: 'Resources', id: resource.id }))
       });
 
-      return worker.get({ table: 'Repositories', search: id }).then((repository) => {
+      return instance.repositories.get(id).then((repository) => {
         const { adapter } = repository;
 
         worker.delete({ table: 'Repositories', id }).then(() => {
@@ -42,7 +44,7 @@ export default function(adapters, worker) {
       })
     },
     getResources(id) {
-      return this.resources.get({ repositoryId: id })
+      return instance.resources.get({ repositoryId: id })
     }
   }
 }

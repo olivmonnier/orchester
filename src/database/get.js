@@ -31,7 +31,7 @@ export default function (table, db, search) {
         data.push(result.value);
         result.continue();
       } else {
-        resolve(data);
+        resolve(data.length == 1 ? data[0] : data);
       }
     }
   })

@@ -5,12 +5,11 @@ import apiRepositories from './api/repositories';
 import apiResources from './api/resources';
 
 export default function(params) {
-  const { basename, adapters, interval } = params;
-  const self = this;
+  const { basename } = params;
 
   const _worker = workerHelper(basename);
 
-  if (isOnline()) sync(params);
+  if (isOnline()) sync(params, _worker);
 
   if (typeof window.addEventListener === "function") {
     window.addEventListener('online', () => sync(params));
@@ -18,7 +17,7 @@ export default function(params) {
   }
 
   return Object.assign(params, {
-    repositories: apiRepositories(adapters, _worker),
-    resources: apiResources(adapters, _worker)
+    repositories: apiRepositories(params, _worker),
+    resources: apiResources(params, _worker)
   })
 }

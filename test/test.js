@@ -3,30 +3,38 @@ var should = chai.should();
 
 describe('Test', function() {
   it('run', function() {
+    var n = 0;
     var orchester = Orchester.run({
       basename: 'Test bdd',
       interval: 10000,
       adapters: {
         'adapter1': {
           get: function(res) {
-            console.log(res, this)
+            //console.log(res, this)
           }
         },
         'adapter2': {
           get: function(res) {
-            console.log(res)
+            var self = this;
+
+            this.resources.put({
+              name: 'test' + n,
+              repositoryId: res.id
+            }).then(function() {
+              n++;
+            })
           },
           post: function(type, res) {
-            console.log('POST Event', res)
+            //console.log('POST Event', res)
           },
           remove: function(type, res) {
-            console.log('DELETE Event', type, res);
+            //console.log('DELETE Event', type, res);
           }
         }
       }
     });
 
-    orchester.repositories.put({
+    /*orchester.repositories.put({
       name: 'Repo 1',
       adapter: 'adapter1',
       synced: true
@@ -42,6 +50,6 @@ describe('Test', function() {
       synced: true
     }).then((res) => {
       orchester.repositories.remove(res.id)
-    });
+    });*/
   })
 });

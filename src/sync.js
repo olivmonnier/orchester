@@ -2,19 +2,17 @@ import workerHelper from './services/workerHelper';
 
 let runnerSync;
 
-export const sync = function(runner) {
+export const sync = function(instance, worker) {
   let runners;
-  const { adapters, basename, interval } = runner;
-
-  const _worker = workerHelper(basename);
+  const { adapters, interval } = instance;
 
   runnerSync = setInterval(() => {
     runners = [];
 
-    _worker.get({ table: 'Repositories', search: {synced: 'true'} }).then((repositories) => {
+    worker.get({ table: 'Repositories', search: {synced: 'true'} }).then((repositories) => {
       if(repositories.length > 0) {
         repositories.forEach((repo) => {
-          runners.push(adapters[repo.adapter].get.call(runner, repo))
+          runners.push(adapters[repo.adapter].get.call(instance, repo))
         })
         Promise.all(runners)
       }
